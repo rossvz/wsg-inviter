@@ -6,15 +6,14 @@ const port = process.env.PORT || 3000;
 const URL = process.env.URL || "http://localhost:3000";
 const TOKEN = process.env.TOKEN;
 const HB_API_TOKEN = process.env.HB_API_TOKEN;
-const REDIRECT_URL = process.env.REDIRECT_URL || "https://google.com";
+const REDIRECT_URL =
+  process.env.REDIRECT_URL || "https://insiders.worshipsoundguy.com/invitation";
 
 // Config
-//todo: add default user role ID
-const DEFAULT_USER_ROLE_ID = process.env.DEFAULT_USER_ROLE_ID || "1234";
-const EXCLUDED_GROUP_IDS = [
-  // todo: add group ids to exclude
-];
-const MAX_USERS_PER_GROUP = process.env.MAX_USERS_PER_GROUP || 2;
+const DEFAULT_USER_ROLE_ID =
+  process.env.DEFAULT_USER_ROLE_ID || "5187dabd-cb0d-4ab6-80b1-8fcd494131ea";
+const EXCLUDED_GROUP_IDS = [];
+const MAX_USERS_PER_GROUP = process.env.MAX_USERS_PER_GROUP || 5;
 
 // ===========================
 
