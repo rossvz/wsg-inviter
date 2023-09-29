@@ -57,7 +57,7 @@ app.get("/invite/:inviteCode", async (req: Request, res: Response) => {
 });
 
 app.post("/invite", isAuthenticated, async (req: Request, res: Response) => {
-  const { groupId, inviteUsers } = req.body;
+  const { groupId } = req.body;
   if (!groupId) {
     return res.status(400).send("Missing groupId");
   } else {

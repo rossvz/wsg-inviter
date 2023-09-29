@@ -27,17 +27,17 @@ export const createInvite = async (groupId: string): Promise<Invite | null> => {
   const invites = await getInvitationsForGroup(groupId);
   return invites[0] || null;
 };
-export const getInvitationsForGroup = async (groupId) => {
+export const getInvitationsForGroup = async (groupId: string) => {
   const invites = await sdk.getInvitations();
-  const groupInvites = invites.data.filter((invite) => invite.groups.some((group) => group.id === groupId)
+  const groupInvites = invites.data.filter((invite: Invite) => invite.groups.some((group) => group.id === groupId)
   );
   return groupInvites;
 };
-export const getGroup = async (groupId) => {
+export const getGroup = async (groupId: string) => {
   return await sdk.getGroup({ groupID: groupId });
 };
-export const getInvitationsByCode = async (code) => {
+export const getInvitationsByCode = async (code: InviteCode) => {
   const invites = await sdk.getInvitations();
-  const invite = invites.data.find((invite) => invite.code == code);
+  const invite = invites.data.find((invite: Invite) => invite.code == code);
   return invite;
 };
