@@ -56,7 +56,7 @@ app.get("/invite/:inviteCode", async (req, res) => {
 });
 
 app.post("/invite", isAuthenticated, async (req, res) => {
-  const { email, groupId } = req.body;
+  const { email, groupId, inviteUsers } = req.body;
   if (!email && !groupId) {
     return res.status(400).send("Missing email or groupId");
   }
@@ -70,7 +70,11 @@ app.post("/invite", isAuthenticated, async (req, res) => {
     res.send(link);
   } else {
     const invite = await inviteByGroupId(groupId);
+    console.log(`Invite created: ${invite.code}`);
     const link = inviteLinkFromInvite(invite);
+    if (inviteUsers) {
+      addUsersToInvite(invite, inviteUsers);
+    }
     res.send(link);
   }
 });
@@ -114,11 +118,13 @@ const inviteByGroupId = async (groupId) => {
 // ============================
 
 const createInvite = async (groupId) => {
-  // todo: set default role IDs!
-  return sdk.createInvitation({
+  await sdk.createInvitation({
     roleID: DEFAULT_USER_ROLE_ID,
     groupIDs: [groupId],
   });
+
+  const invites = await getInvitationsForGroup(groupId);
+  return invites[0];
 };
 
 const getInvitationsForGroup = async (groupId) => {
@@ -145,4 +151,29 @@ const getUserGroupByEmail = async (email) => {
     (group) => !EXCLUDED_GROUP_IDS.includes(group.id)
   );
   return teamGroups.length > 0 ? teamGroups[0] : null;
+};
+
+const addUsersToInvite = async (invite, users) => {
+  let emails = [];
+
+  if (typeof users === "string") {
+    emails = users.split(",").map((email) => email.trim());
+  } else if (Array.isArray(users)) {
+    emails = users;
+  }
+
+  console.log(`Adding users to invite: ${emails.join(", ")}`);
+  try {
+    return await sdk.updateInvitation(
+      {
+        shouldSendEmail: true,
+        emails: emails,
+      },
+      {
+        invitationID: invite.id,
+      }
+    );
+  } catch (error) {
+    console.error(error);
+  }
 };
