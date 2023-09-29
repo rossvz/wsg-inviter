@@ -1,7 +1,9 @@
 services:
   - type: web
-    name: bun
+    name: wsg-inviter
+    runtime: docker
     env: docker
     repo: https://github.com/rossvz/wsg-inviter
     plan: free
     autoDeploy: true
+    branch: bun-docker-ts
