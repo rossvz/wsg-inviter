@@ -7,5 +7,5 @@ RUN bun install
 COPY . .
 
 ENV NODE_ENV production
-
+RUN bun build:prod
 CMD [ "bun", "start" ]

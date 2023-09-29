@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "bun src/index.ts",
-    "dev": "bun --hot index.ts"
+    "dev": "bun --hot src/index.ts",
+    "build:prod": "bun build src/index.ts --outdir build --target bun",
+    "start": "bun build/index.js"
   },
   "author": "",
   "license": "ISC",
