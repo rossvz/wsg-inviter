@@ -59,25 +59,17 @@ app.get("/invite/:inviteCode", async (req, res) => {
 });
 
 app.post("/invite", isAuthenticated, async (req, res) => {
-  const { email, groupId, inviteUsers } = req.body;
-  if (!email && !groupId) {
-    return res.status(400).send("Missing email or groupId");
-  }
-  if (email) {
-    const group = await getUserGroupByEmail(email);
-    if (!group) {
-      return res.status(404).send("User not found");
-    }
-    const invite = await inviteByGroupId(group.id);
-    const link = inviteLinkFromInvite(invite);
-    res.send(link);
+  const { groupId, inviteUsers } = req.body;
+  if (!groupId) {
+    return res.status(400).send("Missing groupId");
   } else {
     const invite = await inviteByGroupId(groupId);
+    if (!invite)
+      return res
+        .status(500)
+        .send("Something went wrong - could not create invite");
     console.log(`Invite created: ${invite.code}`);
     const link = inviteLinkFromInvite(invite);
-    if (inviteUsers) {
-      addUsersToInvite(invite, inviteUsers);
-    }
     res.send(link);
   }
 });
@@ -150,37 +142,4 @@ const getInvitationsByCode = async (code) => {
   const invites = await sdk.getInvitations();
   const invite = invites.data.find((invite) => invite.code == code);
   return invite;
-};
-
-const getUserGroupByEmail = async (email) => {
-  const { data: user } = await sdk.findUser({ email });
-  const teamGroups = user.groups.filter(
-    (group) => !EXCLUDED_GROUP_IDS.includes(group.id)
-  );
-  return teamGroups.length > 0 ? teamGroups[0] : null;
-};
-
-const addUsersToInvite = async (invite, users) => {
-  let emails = [];
-
-  if (typeof users === "string") {
-    emails = users.split(",").map((email) => email.trim());
-  } else if (Array.isArray(users)) {
-    emails = users;
-  }
-
-  console.log(`Adding users to invite: ${emails.join(", ")}`);
-  try {
-    return await sdk.updateInvitation(
-      {
-        shouldSendEmail: true,
-        emails: emails,
-      },
-      {
-        invitationID: invite.id,
-      }
-    );
-  } catch (error) {
-    console.error(error);
-  }
 };
