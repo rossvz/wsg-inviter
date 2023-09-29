@@ -14,6 +14,9 @@ const DEFAULT_USER_ROLE_ID =
   process.env.DEFAULT_USER_ROLE_ID || "5187dabd-cb0d-4ab6-80b1-8fcd494131ea";
 const EXCLUDED_GROUP_IDS = [];
 const MAX_USERS_PER_GROUP = process.env.MAX_USERS_PER_GROUP || 5;
+const GROUP_FULL_URL =
+  process.env.GROUP_FULL_URL ||
+  "https://worshipsoundguy.com/insiders-team-limit-reached/";
 
 // ===========================
 
@@ -49,7 +52,7 @@ app.get("/invite/:inviteCode", async (req, res) => {
     case "Group not found":
       return res.status(404).send("Group not found");
     case "Group is full":
-      return res.status(400).send("Group is full");
+      return res.redirect(GROUP_FULL_URL);
     default:
       return res.status(500).send("Something went wrong");
   }
@@ -104,12 +107,16 @@ const validateInviteCode = async (inviteCode) => {
 const inviteLinkFromInvite = (invite) => `${URL}/invite/${invite.code}`;
 
 const inviteByGroupId = async (groupId) => {
-  const invites = await getInvitationsForGroup(groupId);
+  try {
+    const invites = await getInvitationsForGroup(groupId);
 
-  if (invites.length === 0) {
-    return await createInvite(groupId);
-  } else {
-    return invites[0];
+    if (invites.length === 0) {
+      return await createInvite(groupId);
+    } else {
+      return invites[0];
+    }
+  } catch (error) {
+    console.error(`Error creating invite: ${JSON.stringify(error)}`);
   }
 };
 
