@@ -3,5 +3,5 @@ services:
     name: bun
     env: docker
     repo: https://github.com/rossvz/wsg-inviter
-    plan: starter
+    plan: free
     autoDeploy: true
